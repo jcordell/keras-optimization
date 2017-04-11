@@ -1,0 +1,22 @@
+04/11/2017 02:25:57 PM - INFO - ***Evolving 2 generations with population 3***
+04/11/2017 02:25:57 PM - INFO - ***Doing generation 1 of 2***
+04/11/2017 02:26:02 PM - INFO - Generation average: 23232.99%
+04/11/2017 02:26:02 PM - INFO - --------------------------------------------------------------------------------
+04/11/2017 02:44:17 PM - INFO - ***Evolving 2 generations with population 5***
+04/11/2017 02:44:17 PM - INFO - ***Doing generation 1 of 2***
+04/11/2017 02:44:25 PM - INFO - Generation average: 177.48%
+04/11/2017 02:44:25 PM - INFO - --------------------------------------------------------------------------------
+04/11/2017 02:44:25 PM - INFO - ***Doing generation 2 of 2***
+04/11/2017 02:44:29 PM - INFO - Generation average: 310.80%
+04/11/2017 02:44:29 PM - INFO - --------------------------------------------------------------------------------
+04/11/2017 02:44:29 PM - INFO - --------------------------------------------------------------------------------
+04/11/2017 02:44:29 PM - INFO - {'activation': 'sigmoid', 'nb_layers': 2, 'learning_rate': 0.0005, 'nb_neurons': 30, 'optimizer': 'adam'}
+04/11/2017 02:44:29 PM - INFO - Network accuracy: 66046.09%
+04/11/2017 02:44:29 PM - INFO - {'activation': 'sigmoid', 'nb_layers': 1, 'learning_rate': 0.01, 'nb_neurons': 22, 'optimizer': 'adam'}
+04/11/2017 02:44:29 PM - INFO - Network accuracy: 27671.59%
+04/11/2017 02:44:29 PM - INFO - {'activation': 'sigmoid', 'nb_layers': 1, 'learning_rate': 0.0005, 'nb_neurons': 22, 'optimizer': 'adam'}
+04/11/2017 02:44:29 PM - INFO - Network accuracy: 24715.75%
+04/11/2017 02:44:29 PM - INFO - {'activation': 'sigmoid', 'nb_layers': 2, 'learning_rate': 0.01, 'nb_neurons': 30, 'optimizer': 'adam'}
+04/11/2017 02:44:29 PM - INFO - Network accuracy: 19941.56%
+04/11/2017 02:44:29 PM - INFO - {'activation': 'sigmoid', 'nb_layers': 1, 'learning_rate': 0.0005, 'nb_neurons': 30, 'optimizer': 'adam'}
+04/11/2017 02:44:29 PM - INFO - Network accuracy: 17027.35%
