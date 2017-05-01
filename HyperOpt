@@ -1,0 +1,98 @@
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
+import sys
+import numpy as np
+from sklearn.metrics import mean_squared_error
+import data_parser
+
+
+def getData():
+    data = data_parser.parse("DBTT_Data22.csv")
+    data_lwr = data_parser.parse("CD_LWR_clean8.csv")
+    X = ["N_log(eff fl p =.05)", "N_log(eff fl p =.4)", "N_log(eff fl p =.5)", "N(Cu)", "N(Ni)", "N(Mn)", "N(P)", "N(Si)","N( C )", "N_log(eff fl p =.1)", "N_log(eff fl p =.2)", "N_log(eff fl p =.3)",  "N(Temp)"]
+    Y = "CD delta sigma"
+    data.set_x_features(X)
+    data.set_y_feature(Y)
+    data_lwr.set_y_feature(Y)
+    data_lwr.set_x_features(X)
+    data.add_exclusive_filter("Alloy",'=', 29)
+    data.add_exclusive_filter("Alloy",'=', 8)
+    data.add_exclusive_filter("Alloy", '=', 1)
+    data.add_exclusive_filter("Alloy", '=', 2)
+    data.add_exclusive_filter("Alloy", '=', 14)
+
+    data_lwr.add_exclusive_filter("Alloy",'=', 29)
+    data_lwr.add_exclusive_filter("Alloy", '=', 14)
+    x_test = np.array(data_lwr.get_x_data())
+    y_test = np.array(data_lwr.get_y_data())
+    x_train = np.array(data.get_x_data())
+    y_train = np.array(data.get_y_data())
+    print("Training with", np.shape(y_train)[0], "data points")
+    return x_train, y_train, x_test, y_test
+
+X, y, X_val, y_val = getData()
+
+# normalize y column for better training
+y = y/758.92
+
+space = {'choice': hp.choice('num_layers',
+                    [ {'layers':'two', },
+                    {'layers':'three',
+                    'units3': hp.choice('units3', [5, 15, 25, 40, 50, 75, 100])}
+                    ]),
+
+            'units1': hp.choice('units1', [5, 15, 25, 40, 50, 75, 100]),
+            'units2': hp.choice('units2', [5, 15, 25, 40, 50, 75, 100]),
+            'lr': hp.uniform('lr', .0001, .1),
+
+            'dropout1': hp.uniform('dropout1', .0,.75),
+            'dropout2': hp.uniform('dropout2',  .0,.75),
+
+            #'batch_size' : hp.uniform('batch_size', 28,128),
+
+            'nb_epochs' :  hp.choice('nb_epochs', [2000, 5000, 10000, 20000, 40000]),
+            #'optimizer': hp.choice('optimizer',['adadelta','adam','rmsprop']),
+            'activation': 'sigmoid'
+        }
+
+
+def f_nn(params):
+    from keras.models import Sequential
+    from keras.layers.core import Dense, Dropout, Activation
+    from keras.optimizers import Adadelta, Adam, rmsprop
+
+
+    model = Sequential()
+    model.add(Dense(units=params['units1'], input_dim = np.shape(X)[1]))
+    model.add(Activation('sigmoid'))
+    model.add(Dropout(params['dropout1']))
+
+    model.add(Dense(units=params['units2'], kernel_initializer="glorot_uniform"))
+    model.add(Activation('sigmoid'))
+    model.add(Dropout(params['dropout2']))
+
+    if params['choice']['layers']== 'three':
+        model.add(Dense(units=params['choice']['units3'], kernel_initializer= "glorot_uniform"))
+        model.add(Activation('sigmoid'))
+
+    model.add(Dense(1))
+    model.add(Activation('linear'))
+
+    ADAM = Adam(lr=params['lr'])
+    model.compile(loss='mean_squared_error', metrics=['accuracy'], optimizer=ADAM)
+    #model.compile(loss='binary_crossentropy', optimizer=params['optimizer'])
+
+    model.fit(X, y, epochs=params['nb_epochs'], batch_size=1406, verbose = 0)
+
+    y_predict = model.predict(X_val) * 758.92  # todo way to not hardcode this?
+    rms = np.sqrt(mean_squared_error(y_val, y_predict))
+    print('Params testing, RMS: ', params, rms)
+    sys.stdout.flush()
+    return {'loss': rms, 'status': STATUS_OK}
+
+
+
+
+trials = Trials()
+best = fmin(f_nn, space, algo=tpe.suggest, max_evals=250, trials=trials)
+print('best: ')
+print(best)
